@@ -17,7 +17,7 @@
 #define PATH_TO_TEAPOT_OBJ "teapot.obj"
 
 // Avoiding linker error caused by multiply defined variables
-GLuint VAOs[3], VBOs[3], NBOs[3], EBOs[3];
+GLuint VAOs[3], VBOs[3], NBOs[3], EBOs[3]; // 3 is num objects
 /** TEAPOT RELATED **/
 std::vector <vec3> teapotVertices;
 std::vector <vec3> teapotNormals;
@@ -74,8 +74,8 @@ const GLuint cubeIndices[36] = {
 // Initialize the buffer objects. Can only be called after OpenGL is initialized.
 void initBufferObjects() {
 	// Tell OpenGL to allocate us some space for the VAO
-	glGenVertexArrays(3, VAOs);
-	// Now allocate some space for all the buffer objects
+	glGenVertexArrays(3, VAOs); // generate # VAOs for all objects; creates unique IDs
+	// Now allocate some space for all the buffer objects (for vertices, colors, elements)
 	glGenBuffers(3, VBOs);
 	glGenBuffers(3, NBOs);
 	glGenBuffers(3, EBOs);
@@ -171,16 +171,17 @@ void initTeapot() {
 // This function initializes a cube
 void initCube() {
 	// Done defining the cube properties, now bind it to a VAO
-	glBindVertexArray(VAOs[CUBE]);
+	glBindVertexArray(VAOs[CUBE]); // bind vertex buffer (VAO) to object
 
 	// Bind vertices to layout location 0
+	// select buffer => put data in buffer => enable location => specify vertex attribute location
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[CUBE]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerts), cubeVerts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVerts), cubeVerts, GL_STATIC_DRAW); // (array buffer, size of vertex, size of vertices(where they start), static drawing )
 	glEnableVertexAttribArray(0); // This allows usage of layout location 0 in the vertex shader
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0); // (layout location, vertex array(x,y,z), dtype, normalize?, stride (3 for xyz, float), 0 offset for buffer) 
 
 	// Bind normals to layout location 1
-	glBindBuffer(GL_ARRAY_BUFFER, NBOs[CUBE]);
+	glBindBuffer(GL_ARRAY_BUFFER, NBOs[CUBE]); // now for the normals, do the same thing
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeNorms), cubeNorms, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1); // This allows usage of layout location 1 in the vertex shader
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
@@ -190,7 +191,7 @@ void initCube() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	glBindVertexArray(0); // unbind 
 }
 
 

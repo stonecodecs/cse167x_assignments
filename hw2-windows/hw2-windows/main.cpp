@@ -139,7 +139,7 @@ void specialKey(int key, int x, int y) {
     case 100: //left
       if (transop == view) Transform::left(amount, eye,  up);
       else if (transop == scale) sx -= amount * 0.01 ; 
-      else if (transop == translate) tx -= amount * 0.01 ; 
+      else if (transop == translate) tx -= amount * 0.01 ;
       break;
     case 101: //up
       if (transop == view) Transform::up(amount,  eye,  up);
@@ -157,7 +157,7 @@ void specialKey(int key, int x, int y) {
       else if (transop == translate) ty -= amount * 0.01 ; 
       break;
   }
-  glutPostRedisplay();
+  glutPostRedisplay(); // re-render display
 }
 
 void init() {
@@ -199,8 +199,10 @@ int main(int argc, char* argv[]) {
     std::cerr << "Error: " << glewGetString(err) << std::endl; 
   } 
 
-  init();
+  init(); // creating objects, init shaders
   readfile(argv[1]) ; 
+  
+  // callbacks
   glutDisplayFunc(display);
   glutSpecialFunc(specialKey);
   glutKeyboardFunc(keyboard);
@@ -220,7 +222,7 @@ int main(int argc, char* argv[]) {
   }
 
   printHelp();
-  glutMainLoop();
+  glutMainLoop(); // start main code
   FreeImage_DeInitialise();
   destroyBufferObjects();
   return 0;

@@ -2,7 +2,7 @@
 // Do not use any version older than 330! Modern OpenGL will break!
 
 // Inputs to the vertex shader
-layout (location = 0) in vec3 position;
+layout (location = 0) in vec3 position; // glVertexAttribPointer gives this
 layout (location = 1) in vec3 normal;
 
 // Uniform variables

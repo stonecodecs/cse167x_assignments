@@ -41,6 +41,15 @@ void transformvec (const GLfloat input[4], GLfloat output[4])
 	output[3] = outputvec[3];
 }
 
+void printmat4(const glm::mat4& matrix) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            std::cout << matrix[j][i] << " "; // Directly access elements in column-major order
+        }
+        std::cout << std::endl;
+    }
+}
+
 void display() 
 {
   glClearColor(0, 0, 1, 0);
@@ -55,19 +64,30 @@ void display()
     modelview = Transform::lookAt(eye,center,up); 
   }
 
+  // modelviewPos from 
   glUniformMatrix4fv(modelviewPos, 1, GL_FALSE, &modelview[0][0]);
 
   // Lights are transformed by current modelview matrix. 
   // The shader can't do this globally. 
   // So we need to do so manually.  
   if (numused) {
-    glUniform1i(enablelighting,true);
+    glUniform1i(enablelighting,true); // these are uniform variables in shader that we init
+                                      // by first setting location using glGetUniformLocation (main.cpp)
+                                      // then doing this to set variable "enableighting" to 'true'
 
     // YOUR CODE FOR HW 2 HERE.  
     // You need to pass the light positions and colors to the shader. 
     // glUniform4fv() and similar functions will be useful. See FAQ for help with these functions.
     // The lightransf[] array in variables.h and transformvec() might also be useful here.
     // Remember that light positions must be transformed by modelview.  
+    glUniform1i(numusedcol, numused);
+
+    for (int i = 0; i < numused; i++) {
+        transformvec(&lightposn[i * 4], &lightransf[i * 4]);
+    }
+
+    glUniform4fv(lightpos, numLights, lightransf);
+    glUniform4fv(lightcol, numLights, lightcolor);
 
   } else {
     glUniform1i(enablelighting,false); 
@@ -83,6 +103,7 @@ void display()
   // set up the net transformation matrix for the objects.  
   // Account for GLM issues, matrix order (!!), etc.  
 
+  transf = modelview * tr * sc;
 
   // The object draw functions will need to further modify the top of the stack,
 
@@ -98,6 +119,13 @@ void display()
     // Set up the object transformations 
     // And pass in the appropriate material properties
     // Again glUniform() related functions will be useful
+    modelview = transf * obj->transform;
+
+    glUniform4fv(ambientcol,  1, obj->ambient);
+    glUniform4fv(diffusecol,  1, obj->diffuse);
+    glUniform4fv(specularcol, 1, obj->specular);
+    glUniform4fv(emissioncol, 1, obj->emission);
+    glUniform1f(shininesscol, obj->shininess);
 
     // Actually draw the object
     // We provide the actual drawing functions for you.  
@@ -112,7 +140,8 @@ void display()
     else if (obj->type == teapot) {
       solidTeapot(obj->size); 
     }
-	
+    //std::cout << "obj" << i << std::endl;
+    //printmat4(glm::transpose(modelview));
   }
   
   glutSwapBuffers();
